@@ -34,9 +34,12 @@ FPQR item data to baseline-follow-up, or pre-post, format
 }
 \examples{
 # Read SOFAS scores from database d to pre-post format
+library(tidyr)
+library(dplyr)
 dsof <- d \%>\%
 filter(template_code == "sofas") \%>\%
-select(patient_id, date_created, template_code, question_code, number_answer, treatment_id, visit_id) \%>\%
+select(patient_id, date_created, template_code, question_code, number_answer,
+ treatment_id, visit_id) \%>\%
 group_by(question_code) \%>\%
 mutate(row = row_number()) \%>\% # to define unique rows for pivoting
 ungroup() \%>\%
@@ -45,11 +48,14 @@ select(-row)
 
 # SOFAS, time, and ID variables
 dsof <- subset(dsof, select = c(patient_id, sofas_asteikolla, vapaa_aika,
-                                tyo_tai_opiskelu, perhe_elama_ja_ihmissuhteet,
-                                itsesta_huolehtiminen,date_created, treatment_id, visit_id))
+                                tyo_tai_opiskelu,perhe_elama_ja_ihmissuhteet,
+                                itsesta_huolehtiminen,date_created,
+                                treatment_id, visit_id))
 # Rename from Finnish to English
-names(dsof) <- c("patient_id","sofas","freetime","work","family","self","date_created","treatment_id","visit_id")
+names(dsof) <- c("patient_id","sofas","freetime","work","family","self",
+"date_created","treatment_id","visit_id")
 
 # Finally, call dataToBLFU_wvis
-dsof <- dataToBLFU_wvis(dsof, items = names(dsof)[c(2:6)], d_vis, interrupt_ids = uids_interrupted, use_orig_lab = T)
+dsof <- dataToBLFU_wvis(dsof, items = names(dsof)[c(2:6)], d_vis,
+interrupt_ids = uids_interrupted, use_orig_lab = T)
 }

@@ -12,6 +12,8 @@
 #'
 #' @examples
 #' # Read SOFAS scores from database d to pre-post format
+#' library(tidyr)
+#' library(dplyr)
 #' dsof <- d %>%
 #' filter(template_code == "sofas") %>%
 #' select(patient_id, date_created, template_code, question_code, number_answer,
