@@ -36,7 +36,7 @@ FPQR item data to baseline-follow-up, or pre-post, format
 # Read SOFAS scores from database d to pre-post format
 library(tidyr)
 library(dplyr)
-dsof <- d \%>\%
+dsof <- dsof_example \%>\%
 filter(template_code == "sofas") \%>\%
 select(patient_id, date_created, template_code, question_code, number_answer,
  treatment_id, visit_id) \%>\%
@@ -56,6 +56,6 @@ names(dsof) <- c("patient_id","sofas","freetime","work","family","self",
 "date_created","treatment_id","visit_id")
 
 # Finally, call dataToBLFU_wvis
-dsof <- dataToBLFU_wvis(dsof, items = names(dsof)[c(2:6)], d_vis,
-interrupt_ids = uids_interrupted, use_orig_lab = T)
+dsof <- dataToBLFU_wvis(dsof, items = names(dsof)[c(2:6)], dvis_example,
+interrupt_ids = NULL, use_orig_lab = TRUE)
 }

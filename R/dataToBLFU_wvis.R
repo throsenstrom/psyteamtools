@@ -14,7 +14,7 @@
 #' # Read SOFAS scores from database d to pre-post format
 #' library(tidyr)
 #' library(dplyr)
-#' dsof <- d %>%
+#' dsof <- dsof_example %>%
 #' filter(template_code == "sofas") %>%
 #' select(patient_id, date_created, template_code, question_code, number_answer,
 #'  treatment_id, visit_id) %>%
@@ -34,8 +34,8 @@
 #' "date_created","treatment_id","visit_id")
 #'
 #' # Finally, call dataToBLFU_wvis
-#' dsof <- dataToBLFU_wvis(dsof, items = names(dsof)[c(2:6)], d_vis,
-#' interrupt_ids = uids_interrupted, use_orig_lab = T)
+#' dsof <- dataToBLFU_wvis(dsof, items = names(dsof)[c(2:6)], dvis_example,
+#' interrupt_ids = NULL, use_orig_lab = TRUE)
 dataToBLFU_wvis <- function(dorig, items, dvis, septh=30, interrupt_ids=NULL, use_orig_lab=FALSE){
   # A sub-function to take first non-missing value
   FirstNonMissing <- function(x) ifelse(any(!is.na(x)),x[!is.na(x)][1],NA)
@@ -77,19 +77,21 @@ dataToBLFU_wvis <- function(dorig, items, dvis, septh=30, interrupt_ids=NULL, us
   }
 
   # Add patients with multiple treatments
-  for (i in 1:length(mts_ids)){
-    treatments <- unique(dorig$treatment_id[dorig$patient_id == mts_ids[i]])
-    ntreatments <- length(treatments)
-    for (j in 1:ntreatments){
-      ciset <- rbind(ciset,rep(NA,ncol(ciset)))
-      dtmp <- iset[(iset$id == mts_ids[i])&(iset$treatment_id == treatments[j]),]
-      ciset$id[nrow(ciset)] <- mts_ids[i]
-      # E.g. audit items wind up to multiple rows: take first non-empty
-      ciset[nrow(ciset),2:ncol(iset)] <-
-        c(apply(dtmp[dtmp$cdate==min(dtmp$cdate),2:(ncol(dtmp)-1)],2,FirstNonMissing),min(dtmp$cdate))
-      if (length(unique(dtmp$cdate))>1){
-        ciset[nrow(ciset), (ncol(iset)+1):ncol(ciset)] <-
-          c(apply(dtmp[dtmp$cdate==max(dtmp$cdate),2:(ncol(dtmp)-1)],2,FirstNonMissing),max(dtmp$cdate))
+  if (length(mts_ids) > 0) {
+    for (i in 1:length(mts_ids)){
+      treatments <- unique(dorig$treatment_id[dorig$patient_id == mts_ids[i]])
+      ntreatments <- length(treatments)
+      for (j in 1:ntreatments){
+        ciset <- rbind(ciset,rep(NA,ncol(ciset)))
+        dtmp <- iset[(iset$id == mts_ids[i])&(iset$treatment_id == treatments[j]),]
+        ciset$id[nrow(ciset)] <- mts_ids[i]
+        # E.g. audit items wind up to multiple rows: take first non-empty
+        ciset[nrow(ciset),2:ncol(iset)] <-
+          c(apply(dtmp[dtmp$cdate==min(dtmp$cdate),2:(ncol(dtmp)-1)],2,FirstNonMissing),min(dtmp$cdate))
+        if (length(unique(dtmp$cdate))>1){
+          ciset[nrow(ciset), (ncol(iset)+1):ncol(ciset)] <-
+            c(apply(dtmp[dtmp$cdate==max(dtmp$cdate),2:(ncol(dtmp)-1)],2,FirstNonMissing),max(dtmp$cdate))
+        }
       }
     }
   }
