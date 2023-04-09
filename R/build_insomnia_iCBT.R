@@ -16,6 +16,16 @@
 #' @export
 #'
 #' @examples
+#' # Make test data. Alternatively, read in real data.
+#' a <- make_testdata_insomnia_iCBT()
+#' # Build one joined data frame from the registry tables
+#' d <- build_insomnia_iCBT(
+#' d_patient = a$d_patient,
+#' d_t = a$d_t,
+#' d_tp = a$d_tp,
+#' d_tpi = a$d_tpi,
+#' d_tpiq = a$d_tpiq
+#' )
 build_insomnia_iCBT <- function(d_patient, d_t, d_tp, d_tpi, d_tpiq, d_tptq,
                                 remove_formula_rows = TRUE){
   # Join the analysis data

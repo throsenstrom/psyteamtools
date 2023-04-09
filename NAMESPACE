@@ -3,3 +3,4 @@
 export(build_insomnia_iCBT)
 export(build_tidy_FPQR)
 export(dataToBLFU_wvis)
+export(make_testdata_insomnia_iCBT)

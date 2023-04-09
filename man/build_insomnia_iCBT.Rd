@@ -36,3 +36,15 @@ Builds a tidy iCBT data frame by joining multiple data tables from
 the original Healthfox database. One row corresponds to one questionaire
 question-value pair.
 }
+\examples{
+# Make test data. Alternatively, read in real data.
+a <- make_testdata_insomnia_iCBT()
+# Build one joined data frame from the registry tables
+d <- build_insomnia_iCBT(
+d_patient = a$d_patient,
+d_t = a$d_t,
+d_tp = a$d_tp,
+d_tpi = a$d_tpi,
+d_tpiq = a$d_tpiq
+)
+}
