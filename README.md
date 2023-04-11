@@ -12,13 +12,11 @@ group’s common tasks.
 
 ## Installation
 
-You can install the development version of psyteamtools like so:
-
-Clone the development version of the `psyteamtools` to your machine,
-navigate to its main folder and use:
+You can install the development version of `psyteamtools` like so:
 
 ``` r
-devtools::install()
+# install.packages("devtools")
+devtools::install_github("throsenstrom/psyteamtools")
 ```
 
 ## Examples
