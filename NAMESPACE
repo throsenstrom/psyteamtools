@@ -3,4 +3,8 @@
 export(build_insomnia_iCBT)
 export(build_tidy_FPQR)
 export(dataToBLFU_wvis)
+export(direction_dependence)
+export(instantaneous_effect_confounding_test)
+export(kgv_contrast)
+export(lagged_direction_dependence)
 export(make_testdata_insomnia_iCBT)

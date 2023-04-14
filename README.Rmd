@@ -33,15 +33,15 @@ devtools::install_github("throsenstrom/psyteamtools")
 
 ### Insomnia internet-delivered Cognitive Behavior Therapy (iCBT)
 
-Normally, one would use this package in a sensitive-data environment, where one could e.g. read in the registry by uncommenting and running the below code:
+Normally, one would use this package in a sensitive-data environment, where one could e.g. read in the registry by running the below code:
 
-```{r iiCBT_readin_example}
-# d_t <- vroom::vroom("Therapy.csv") # Therapy data table
-# d_tp <- vroom::vroom("TherapyPhase.csv") # TherapyPhase data table
-# d_tpi <- vroom::vroom("TherapyPhaseInquiry.csv") # TherapyPhaseInquiry data table
-# d_tpiq <- vroom::vroom("TherapyPhaseInquiryQuestion.csv") # TherapyPhaseInquiryQuestion data table
-# d_tptq <- vroom::vroom("TherapyPhaseTaskQuestion.csv") # TherapyPhaseTaskQuestion data table
-# d_patient <- vroom::vroom("Patient.csv") # Patient data table
+```{r iiCBT_readin_example, eval=FALSE}
+d_t <- vroom::vroom("Therapy.csv") # Therapy data table
+d_tp <- vroom::vroom("TherapyPhase.csv") # TherapyPhase data table
+d_tpi <- vroom::vroom("TherapyPhaseInquiry.csv") # TherapyPhaseInquiry data table
+d_tpiq <- vroom::vroom("TherapyPhaseInquiryQuestion.csv") # TherapyPhaseInquiryQuestion data table
+d_tptq <- vroom::vroom("TherapyPhaseTaskQuestion.csv") # TherapyPhaseTaskQuestion data table
+d_patient <- vroom::vroom("Patient.csv") # Patient data table
 ```
 
 Outside an environment with real data, one may generate some fake data as follows:
@@ -58,7 +58,7 @@ d_tpiq <- d$d_tpiq
 
 One may then build a tidy long-format data frame, where one question-answer is one row by taking:
 
-```{r iiCBT_build_example}
+```{r iiCBT_build_example, warning=FALSE, message=FALSE}
 # Build a tidy iCBT data frame by joining multiple original-data tables
 d <- build_insomnia_iCBT(
   d_patient = d_patient,
@@ -75,7 +75,7 @@ This function by default removes data rows containing Healthfox's formula-based 
 
 One may extract data from the FPQR using e.g. (we use the fake example data `dsof_example` and `dvis_example` in below)
 
-```{r FPQR_build_example}
+```{r FPQR_build_example, warning=FALSE, message=FALSE}
 # FPQR item data to baseline-follow-up, or pre-post, format
 # Read SOFAS scores from database d to pre-post format (using example data)
 library(tidyr)
@@ -115,3 +115,12 @@ TBA
 ### Hilmo etc.
 
 TBA
+
+## Additional tools
+
+### Direction of dependence inference
+
+We include functions from the paper:
+Rosenström, T. H., Czajkowski, N. O., Solbakken, O. A., & Saarni, S. E. (2023). Direction of dependence analysis for pre-post assessments using non-Gaussian methods: A tutorial. Psychotherapy Research. [https://doi.org/10.1080/10503307.2023.2167526](https://doi.org/10.1080/10503307.2023.2167526)
+
+For use instructions, see the paper or the [Bitbucket repo](https://bitbucket.org/rosenstroem/dda_prepost/src/master/)
