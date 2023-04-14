@@ -213,5 +213,110 @@ build_tidy_FPQR <- function(d_forms, d_tre, d_vis, d_pat, no_kela = T,
 
   daudit <- dataToBLFU_wvis(daudit, items = names(daudit)[2+c(4,5,8)], d_vis, interrupt_ids = uids_interrupted)
 
+}
 
+# A function to detect primary care units as a source of referral
+IsAdultPrimaryCare <- function(id){
+  x <- d[d$patient_id == id,]
+  from_primary_care <- ("aikuisten" %in% x$string_answer[x$question_code=="erikoisala"]) &
+    ("ostopalvelu" %in% x$string_answer[x$question_code=="palvelumuoto"]) &
+    ( any(x$string_answer[x$question_code=="terapiaan_lahettava_yksikko"] %in% c("muu", "1126002", "2126001")) | 
+        ("perusterveydenhuollosta" %in% x$string_answer[x$question_code=="mista_lahetetty"]) )
+  return(from_primary_care)
+}
+
+# A function to detect short adult therapies
+IsShortTherapy <- function(id){
+  x <- d[d$patient_id == id,]
+  short_therapy <- ("aikuisten" %in% x$string_answer[x$question_code=="erikoisala"]) &
+    ("lyhyt" %in% x$string_answer[x$question_code=="terapian_pituus"])
+  return(short_therapy)
+}
+
+# Call functions:
+# PickVar1
+# AdultDataQuality
+
+
+###### Tidy up the data using the functions #######
+system.time({
+  dd <- data.frame( patient_id = uids_completed, 
+                    primary_care = sapply(uids_completed, IsAdultPrimaryCare),
+                    short_therapy = sapply(uids_completed, IsShortTherapy),
+                    full_data = sapply(uids_completed, AdultDataQuality),
+                    patientQ = sapply(uids_completed, AdultDataQuality, template="patientQ"),
+                    therapistQ = sapply(uids_completed, AdultDataQuality, template="therapistQ"),
+                    questionnaires = sapply(uids_completed, AdultDataQuality, template="questionnaires"))
+}) 
+
+dd <- cbind( dd, therapy_class = factor(rep("long", nrow(dd)), levels = c("long", "PC", "short_SC")) )
+dd$therapy_class[dd$primary_care] <- "PC"
+dd$therapy_class[(!dd$primary_care)&dd$short_therapy] <- "short_SC"
+
+
+######## Characteristics of patients #########
+system.time({
+  dd <- cbind(dd,
+              sex = sapply(uids_completed, PickVar1, varnam="sukupuoli", template="taustatiedot"),
+              cohabiting = sapply(uids_completed, PickVar1, 
+                                  varnam="avioliitto", template="aikuispotilaan_alkuarvio"),
+              work = sapply(uids_completed, PickVar1, 
+                            varnam="tyo_opiskelutilanne", template="aikuispotilaan_alkuarvio"),
+              therapist = sapply(uids_completed, PickVar1, 
+                                 varnam="psykoterapeutti", template="aikuispotilaan_alkuarvio"),
+              medication = sapply(uids_completed, PickVar1, 
+                                  varnam="psyykelaakkeet", template="aikuispotilaan_alkuarvio"),
+              smoking = sapply(uids_completed, PickVar1, 
+                               varnam="tupakointi", template="aikuispotilaan_alkuarvio"),
+              diagnosis = sapply(uids_completed, PickVar1, 
+                                 varnam="paadiagnoosi", template="taustatiedot"),
+              therapy = sapply(uids_completed, PickVar1, 
+                               varnam="terapiamuoto", template="taustatiedot"),
+              framework = sapply(uids_completed, PickVar1, 
+                                 varnam="terapiasuuntaus", template="taustatiedot"))
+}) 
+
+# Binary for sex
+dd <- dd %>% mutate(sex_f = (sex=="F")*1)
+
+# Add dummy variables for tabulating
+dd <- fastDummies::dummy_cols(dd,select_columns = c("cohabiting","work","medication","smoking","therapist","therapy","framework"))
+
+# Combine diagnoses for tabulating
+dd <- dd %>%
+  mutate(dg_depression = grepl("F32",diagnosis)|grepl("F33",diagnosis)|grepl("F34",diagnosis)|
+           grepl("F35",diagnosis)|grepl("F36",diagnosis)|grepl("F37",diagnosis)|grepl("F38",diagnosis)|
+           grepl("F39",diagnosis)) %>%
+  mutate(dg_anxiety = grepl("F40",diagnosis)|grepl("F41",diagnosis)|grepl("F42",diagnosis)|grepl("F43",diagnosis)|
+           grepl("F44",diagnosis)|grepl("F45",diagnosis)|grepl("F46",diagnosis)|grepl("F47",diagnosis)|
+           grepl("F48",diagnosis)|grepl("F49",diagnosis)) %>%
+  mutate(dg_alcohol = grepl("F10",diagnosis)) %>%
+  mutate(dg_physio = grepl("F50",diagnosis)|grepl("F51",diagnosis)|grepl("F52",diagnosis)|grepl("F53",diagnosis)|
+           grepl("F54",diagnosis)|grepl("F55",diagnosis)|grepl("F56",diagnosis)|grepl("F57",diagnosis)|
+           grepl("F58",diagnosis)|grepl("F59",diagnosis)) %>%
+  mutate(dg_schiz_bd = grepl("F31",diagnosis)|grepl("F20",diagnosis)) %>%
+  mutate(dg_other = !(dg_depression|dg_anxiety|dg_alcohol|dg_physio|dg_schiz_bd))
+
+
+
+
+############# Outcomes by class ##############
+# Call functions
+# SumById
+# SumById_core 
+
+
+ddd <- data.frame(patient_id = dd$patient_id, therapy_class = dd$therapy_class,
+                  sofas_bl = sapply(dd$patient_id, function(x) ifelse(x %in% dsof$patient_id, dsof$sofas[dsof$patient_id==x], NA)),
+                  sofas_fu = sapply(dd$patient_id, function(x) ifelse(x %in% dsof$patient_id, dsof$sofasFU[dsof$patient_id==x], NA)),
+                  core_bl = sapply(dd$patient_id, SumById_core, dat=dcom, wave="BL"),
+                  core_fu = sapply(dd$patient_id, SumById_core, dat=dcom, wave="FU"),
+                  oasis_bl = sapply(dd$patient_id, SumById, dat=doasis, wave="BL"),
+                  oasis_fu = sapply(dd$patient_id, SumById, dat=doasis, wave="FU"),
+                  phq_bl = sapply(dd$patient_id, SumById, dat=dphq, wave="BL"),
+                  phq_fu = sapply(dd$patient_id, SumById, dat=dphq, wave="FU"),
+                  audit_bl = sapply(dd$patient_id, SumById, dat=daudit, wave="BL", narm=T),
+                  audit_fu = sapply(dd$patient_id, SumById, dat=daudit, wave="FU", narm=T))
+
+# save.image(file = "preprocessed.Rdata")
 }
