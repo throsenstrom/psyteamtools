@@ -1,3 +1,9 @@
+#' Sanna's scripts commented out
+#'
+#' @return
+#' @export
+#'
+#' @examples
 sm_script_transfer <- function() {
   return(1+2)
 

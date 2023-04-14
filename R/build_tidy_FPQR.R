@@ -102,22 +102,22 @@ build_tidy_FPQR <- function(d_forms, d_tre, d_vis, d_pat, no_kela = T,
 
   if (no_repeated_FPQR_treatments){
 
-  ##################################################################################
-  ########## Then restrict to adults with 1 outsourced non-Kela therapy ############
-  ##################################################################################
+    ##################################################################################
+    ########## Then restrict to adults with 1 outsourced non-Kela therapy ############
+    ##################################################################################
 
-  # Find patients with multiple treatments
-  mts_ids <- sapply(uids_completed, function(x) length(unique(d$treatment_id[d$patient_id == x])) > 1)
-  mts_ids <- uids_completed[mts_ids]
-  uids_completed <- setdiff(uids_completed, mts_ids)
-  uids_midterm_only <- setdiff(uids_midterm_only, mts_ids)
+    # Find patients with multiple treatments
+    mts_ids <- sapply(uids_completed, function(x) length(unique(d$treatment_id[d$patient_id == x])) > 1)
+    mts_ids <- uids_completed[mts_ids]
+    uids_completed <- setdiff(uids_completed, mts_ids)
+    uids_midterm_only <- setdiff(uids_midterm_only, mts_ids)
   }
   if (no_internal_therapies){
-  # Remove internal psyhotherapies, leave outsourced only (26.1.2022)
-  int_ids <- sapply(uids_completed, function(x) ("sisainen" %in% d$string_answer[(d$patient_id==x)&(d$question_code=="palvelumuoto")]))
-  int_ids <- uids_completed[int_ids]
-  uids_completed <- setdiff(uids_completed, int_ids)
-  uids_midterm_only <- setdiff(uids_midterm_only, int_ids)
+    # Remove internal psyhotherapies, leave outsourced only (26.1.2022)
+    int_ids <- sapply(uids_completed, function(x) ("sisainen" %in% d$string_answer[(d$patient_id==x)&(d$question_code=="palvelumuoto")]))
+    int_ids <- uids_completed[int_ids]
+    uids_completed <- setdiff(uids_completed, int_ids)
+    uids_midterm_only <- setdiff(uids_midterm_only, int_ids)
   }
 
   ##################################################################################
@@ -212,6 +212,4 @@ build_tidy_FPQR <- function(d_forms, d_tre, d_vis, d_pat, no_kela = T,
     select(-row)
 
   daudit <- dataToBLFU_wvis(daudit, items = names(daudit)[2+c(4,5,8)], d_vis, interrupt_ids = uids_interrupted)
-
-
 }
