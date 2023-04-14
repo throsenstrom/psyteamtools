@@ -24,16 +24,15 @@ devtools::install_github("throsenstrom/psyteamtools")
 ### Insomnia internet-delivered Cognitive Behavior Therapy (iCBT)
 
 Normally, one would use this package in a sensitive-data environment,
-where one could e.g. read in the registry by uncommenting and running
-the below code:
+where one could e.g. read in the registry by running the below code:
 
 ``` r
-# d_t <- vroom::vroom("Therapy.csv") # Therapy data table
-# d_tp <- vroom::vroom("TherapyPhase.csv") # TherapyPhase data table
-# d_tpi <- vroom::vroom("TherapyPhaseInquiry.csv") # TherapyPhaseInquiry data table
-# d_tpiq <- vroom::vroom("TherapyPhaseInquiryQuestion.csv") # TherapyPhaseInquiryQuestion data table
-# d_tptq <- vroom::vroom("TherapyPhaseTaskQuestion.csv") # TherapyPhaseTaskQuestion data table
-# d_patient <- vroom::vroom("Patient.csv") # Patient data table
+d_t <- vroom::vroom("Therapy.csv") # Therapy data table
+d_tp <- vroom::vroom("TherapyPhase.csv") # TherapyPhase data table
+d_tpi <- vroom::vroom("TherapyPhaseInquiry.csv") # TherapyPhaseInquiry data table
+d_tpiq <- vroom::vroom("TherapyPhaseInquiryQuestion.csv") # TherapyPhaseInquiryQuestion data table
+d_tptq <- vroom::vroom("TherapyPhaseTaskQuestion.csv") # TherapyPhaseTaskQuestion data table
+d_patient <- vroom::vroom("Patient.csv") # Patient data table
 ```
 
 Outside an environment with real data, one may generate some fake data
@@ -61,15 +60,6 @@ d <- build_insomnia_iCBT(
   d_tpi = d_tpi,
   d_tpiq = d_tpiq
 )
-#> Warning: package 'magrittr' was built under R version 4.0.5
-#> 
-#> Attaching package: 'dplyr'
-#> The following objects are masked from 'package:stats':
-#> 
-#>     filter, lag
-#> The following objects are masked from 'package:base':
-#> 
-#>     intersect, setdiff, setequal, union
 ```
 
 This function by default removes data rows containing Healthfox’s
@@ -86,11 +76,6 @@ data `dsof_example` and `dvis_example` in below)
 # FPQR item data to baseline-follow-up, or pre-post, format
 # Read SOFAS scores from database d to pre-post format (using example data)
 library(tidyr)
-#> 
-#> Attaching package: 'tidyr'
-#> The following object is masked from 'package:magrittr':
-#> 
-#>     extract
 library(dplyr)
 dsof <- dsof_example %>%
 filter(template_code == "sofas") %>%
@@ -127,3 +112,16 @@ TBA
 ### Hilmo etc.
 
 TBA
+
+## Additional tools
+
+### Direction of dependence inference
+
+We include functions from the paper: Rosenström, T. H., Czajkowski, N.
+O., Solbakken, O. A., & Saarni, S. E. (2023). Direction of dependence
+analysis for pre-post assessments using non-Gaussian methods: A
+tutorial. Psychotherapy Research.
+<https://doi.org/10.1080/10503307.2023.2167526>
+
+For use instructions, see the paper or the [Bitbucket
+repo](https://bitbucket.org/rosenstroem/dda_prepost/src/master/)
