@@ -1,3 +1,14 @@
+#' Adult Data Quality function
+#' A function to detect data quality (presence of full data, or presence of given dataset if a template is defined)
+#'
+#' @param id
+#' @param template
+#'
+#' @return
+#' @export
+#'
+#' @examples
+#'
 AdultDataQuality <- function(id, template=NULL){ # template = "patientQ", "therapistQ", or "questionnaires"
   # define sub-function to investigate presence of BL and FU values in the questionnaire data
   QualityBLFU <- function(dql, use_orig_lab=T){
@@ -11,7 +22,7 @@ AdultDataQuality <- function(id, template=NULL){ # template = "patientQ", "thera
   }
   # Quality of full data
   if (is.null(template)){
-    has_quality <- (id %in% dsof$patient_id) & (id %in% dcom$patient_id) & (id %in% doasis$patient_id) & 
+    has_quality <- (id %in% dsof$patient_id) & (id %in% dcom$patient_id) & (id %in% doasis$patient_id) &
       (id %in% dphq$patient_id) & (id %in% daudit$patient_id)
     if (!has_quality){
       return(has_quality) # return immediately if missing a questionnaire, otherwise check both the baseline and the follow-up...
@@ -23,25 +34,25 @@ AdultDataQuality <- function(id, template=NULL){ # template = "patientQ", "thera
         QualityBLFU(daudit[daudit$patient_id == id, ], use_orig_lab = F)   # AUDIT-C
       # ...and check patient and therapist Q
       x <- d[d$patient_id == id,]
-      has_quality <- (all(c("aikuispotilaan_alkuarvio", 
+      has_quality <- (all(c("aikuispotilaan_alkuarvio",
                             "aikuispotilaan_loppu_valiarvio",
-                            "psykoterapeutin_alkuarvio_aikuiset", 
+                            "psykoterapeutin_alkuarvio_aikuiset",
                             "psykoterapeutin_loppu_valiarvio_aikuispotilaat") %in% x$template_code)) &
         has_quality
     }
   } else {
     if (template == "patientQ"){
       x <- d[d$patient_id == id,]
-      has_quality <- all(c("aikuispotilaan_alkuarvio", 
+      has_quality <- all(c("aikuispotilaan_alkuarvio",
                            "aikuispotilaan_loppu_valiarvio") %in% x$template_code)
     }
     if (template == "therapistQ"){
       x <- d[d$patient_id == id,]
-      has_quality <- all(c("psykoterapeutin_alkuarvio_aikuiset", 
+      has_quality <- all(c("psykoterapeutin_alkuarvio_aikuiset",
                            "psykoterapeutin_loppu_valiarvio_aikuispotilaat") %in% x$template_code)
     }
     if (template == "questionnaires"){
-      has_quality <- (id %in% dsof$patient_id) & (id %in% dcom$patient_id) & (id %in% doasis$patient_id) & 
+      has_quality <- (id %in% dsof$patient_id) & (id %in% dcom$patient_id) & (id %in% doasis$patient_id) &
         (id %in% dphq$patient_id) & (id %in% daudit$patient_id)
       if (!has_quality){
         return(has_quality) # return immediately if missing a questionnaire
